@@ -5,11 +5,11 @@ import '../../widgets/start_button.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _handleStart() {
+  void _onStart() {
     debugPrint('Race started!');
   }
 
-  void _handleStop() {
+  void _onStop() {
     debugPrint('Race stopped!');
   }
 
@@ -19,8 +19,8 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Race Tracking')),
       body: Center(
         child: StartButton(
-          onStart: _handleStart,
-          onStop: _handleStop,
+          onStart: _onStart,
+          onStop: _onStop,
         ),
       ),
     );
