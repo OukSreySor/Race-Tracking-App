@@ -26,4 +26,5 @@ class ParticipantProvider with ChangeNotifier {
     _participants.remove(participant);
     notifyListeners();
   }
+  bool get hasParticipants => _participants.isNotEmpty;
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:race_tracking_app/providers/bottom_nav_provider.dart';
 import 'package:race_tracking_app/screens/add_participant_screen.dart';
 import 'package:race_tracking_app/screens/home_screen.dart';
+import 'package:race_tracking_app/screens/monitoring_screen.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   CustomBottomNavigationBar({super.key});
@@ -35,7 +36,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   if (index == 0) {
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ParticipantListScreen()));
                   } else if (index == 1) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => AddParticipantScreen())); //example
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MonitoringScreen())); 
                   } else if (index == 2) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => AddParticipantScreen())); //example
                   }

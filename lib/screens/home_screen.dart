@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracking_app/providers/participant_provider.dart';
@@ -7,23 +6,34 @@ import 'package:race_tracking_app/screens/add_participant_screen.dart';
 import 'package:race_tracking_app/widgets/actions/custom_action_button.dart';
 import 'package:race_tracking_app/widgets/actions/custom_bottom_navigation_bar.dart';
 
+import '../theme/theme.dart';
+
 class ParticipantListScreen extends StatefulWidget {
   const ParticipantListScreen({super.key});
-
 
   @override
   State<ParticipantListScreen> createState() => _ParticipantListScreenState();
 }
 
 class _ParticipantListScreenState extends State<ParticipantListScreen> {
-
   @override
   Widget build(BuildContext context) {
     final participantProvider = Provider.of<ParticipantProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Participant List', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            const SizedBox(width: 16), 
+            Text('Participant List',
+                style: TextStyle(
+                    color: RaceColors.black,
+                    fontSize: RaceTextStyles.heading.fontSize,
+                    fontWeight: RaceTextStyles.heading.fontWeight)),
+          ],
+        ),
+        backgroundColor: RaceColors.white,
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -35,7 +45,10 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
                 icon: Icons.add,
                 backgroundColor: Color(0xFFECEFCA),
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddParticipantScreen()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddParticipantScreen()));
                 },
               ),
               const SizedBox(height: 16),
@@ -48,7 +61,8 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
                         1: FlexColumnWidth(3),
                         2: FlexColumnWidth(2),
                       },
-                      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
                       children: [
                         TableRow(
                           decoration: BoxDecoration(color: Color(0xFFECEFCA)),
@@ -58,7 +72,8 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
                             tableCell('Gender', isHeader: true),
                           ],
                         ),
-                        for (var participant in participantProvider.participants)
+                        for (var participant
+                            in participantProvider.participants)
                           TableRow(
                             children: [
                               tableCell(participant.bib),
@@ -76,7 +91,6 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
         padding: const EdgeInsets.all(8.0),
         child: CustomBottomNavigationBar(),
       ),
-
     );
   }
 
@@ -89,7 +103,4 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
       ),
     );
   }
-
-  
 }
-

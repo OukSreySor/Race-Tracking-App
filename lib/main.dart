@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:race_tracking_app/providers/bottom_nav_provider.dart';
-import 'package:race_tracking_app/providers/participant_provider.dart';
-import 'package:race_tracking_app/repositories/mock_participant_repository.dart';
-import 'package:race_tracking_app/screens/home_screen.dart';
-import 'package:race_tracking_app/theme/theme.dart';
+import 'package:race_tracking_app/providers/race_segment_provider.dart';
+import 'providers/bottom_nav_provider.dart';
+import 'providers/participant_provider.dart';
+import 'repositories/mock_participant_repository.dart';
+import 'screens/home_screen.dart';
+import 'theme/theme.dart';
 
 void main() {
   runApp(
@@ -12,6 +13,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => ParticipantProvider(MockParticipantRepository())),      
         ChangeNotifierProvider(create: (_) => BottomNavProvider()), 
+        ChangeNotifierProvider(create: (_) => RaceSegmentProvider()),
       ],
       child: MyApp(),
     ),
