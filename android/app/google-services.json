@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "65990435445",
+    "project_id": "racetrackingapp-e9696",
+    "storage_bucket": "racetrackingapp-e9696.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65990435445:android:1de531f46673a9343f4e3c",
+        "android_client_info": {
+          "package_name": "com.cadt.racetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJoLoo32gb2852bADI9YRVxoxGVg_ebxo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:65990435445:android:fba0579dd7b2b0a63f4e3c",
+        "android_client_info": {
+          "package_name": "com.example.race_tracking_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJoLoo32gb2852bADI9YRVxoxGVg_ebxo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

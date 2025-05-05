@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:race_tracking_app/services/database_service.dart';
 import '../model/participant.dart';
 
 class ParticipantProvider with ChangeNotifier {
-  //final ParticipantRepository repository;
-  final List<Participant> _participants = [];
+  List<Participant> _participants = [];
 
-  // ParticipantProvider(){
-  //   fetchParticipants();
-  // }
+  ParticipantProvider(){
+    loadParticipants();
+  }
 
   List<Participant> get participants => _participants;
 
-  // void fetchParticipants() {
-  //   _participants = repository.getParticipants();
-  //   notifyListeners();
-  // }
-
-  void addParticipant(Participant participant) {
-    _participants.add(participant);
+  // Load all participants from the database
+  Future<void> loadParticipants() async {
+    _participants = await DatabaseService().getParticipants();
     notifyListeners();
   }
 
-  void updateParticipant(String id, Participant updatedParticipant) {
-    final index = _participants.indexWhere((p) => p.id == id);
-    if (index != -1) {
-      _participants[index] = updatedParticipant;
-      notifyListeners();
-    }
+  // Add a new participant
+  Future<void> addParticipant(Participant participant) async {
+    await DatabaseService().addParticipant(participant);
+    await loadParticipants();  
   }
 
-  void removeParticipant(String id) {
-    _participants.removeWhere((p) => p.id == id);
-    notifyListeners();
+  // Update an existing participant
+  Future<void> updateParticipant(String id, Participant updatedParticipant) async {
+    await DatabaseService().updateParticipant(id, updatedParticipant);
+    await loadParticipants(); 
+  }
+
+  // Delete a participant
+  Future<void> removeParticipant(String id) async {
+    await DatabaseService().deleteParticipant(id);
+    await loadParticipants();  
   }
 
   bool isBibAlreadyUsed (String bib) {
