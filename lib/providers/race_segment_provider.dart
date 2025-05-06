@@ -14,4 +14,29 @@ class RaceSegmentProvider with ChangeNotifier {
     _segments[index].status = newStatus;
     notifyListeners();
   }
+
+  void startSegment(int index) {
+    segments[index].status = SegmentStatus.inProgress;
+    segments[index].startTime = DateTime.now();
+    notifyListeners();
+  }
+
+  void completeSegment(int index) {
+    segments[index].status = SegmentStatus.completed;
+    segments[index].endTime = DateTime.now();
+    notifyListeners();
+  }
+
+  void reset() {
+    for (var segment in _segments) {
+      segment.status = SegmentStatus.notStarted;
+      segment.startTime = null;
+      segment.endTime = null;
+    }
+    notifyListeners();
+  }
+
+  DateTime? getSegmentStartTime(SegmentType type) {
+    return _segments.firstWhere((seg) => seg.type == type).startTime;
+  }
 }

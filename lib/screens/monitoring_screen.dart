@@ -6,6 +6,7 @@ import 'package:race_tracking_app/screens/segment_detail_screen.dart';
 import 'package:race_tracking_app/widgets/actions/segment_card.dart';
 import 'package:race_tracking_app/widgets/actions/start_stop_button.dart';
 import '../providers/participant_provider.dart';
+import '../providers/race_log_provider.dart';
 import '../theme/theme.dart';
 import '../widgets/actions/custom_bottom_navigation_bar.dart';
 
@@ -26,15 +27,18 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
     void _onStart() {
       for (var i = 0; i < segmentProvider.segments.length; i++) {
         if (segmentProvider.segments[i].status == SegmentStatus.notStarted) {
-          segmentProvider.updateSegmentStatus(i, SegmentStatus.inProgress);
+          segmentProvider.startSegment(i);
         }
       }
     }
 
     void _onStop() {
-      for (var i = 0; i < segmentProvider.segments.length; i++) {
-        segmentProvider.updateSegmentStatus(i, SegmentStatus.notStarted);
-      }
+      context.read<RaceSegmentProvider>().reset();
+      context.read<RaceLogProvider>().reset();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All race data has been reset.')),
+      );
     }
 
     return Scaffold(
@@ -78,15 +82,18 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     final segment = segmentProvider.segments[index];
                     return RaceSegmentCard(
                       segment: segment,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                SegmentDetailsScreen(segment: segment),
-                          ),
-                        );
-                      },
+                      onTap: segmentProvider.segments
+                              .any((s) => s.status == SegmentStatus.inProgress)
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SegmentDetailsScreen(segment: segment),
+                                ),
+                              );
+                            }
+                          : null,
                     );
                   },
                 ),

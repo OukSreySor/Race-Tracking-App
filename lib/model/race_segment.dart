@@ -5,6 +5,9 @@ class RaceSegment {
   final SegmentType type;
   SegmentStatus status;
   Duration? duration;
+  DateTime? startTime;
+  DateTime? endTime;
+
 
   RaceSegment({
     required this.type,

@@ -1,7 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+<<<<<<< HEAD
 import 'package:race_tracking_app/firebase_options.dart';
+=======
+import 'package:race_tracking_app/providers/race_log_provider.dart';
+>>>>>>> 8a21ebf (Race Segment and Result Screen)
 import 'package:race_tracking_app/providers/race_segment_provider.dart';
 import 'providers/bottom_nav_provider.dart';
 import 'providers/participant_provider.dart';
@@ -20,6 +24,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ParticipantProvider()),      
         ChangeNotifierProvider(create: (_) => BottomNavProvider()), 
         ChangeNotifierProvider(create: (_) => RaceSegmentProvider()),
+        ChangeNotifierProvider(create: (_) => RaceLogProvider())
       ],
       child: MyApp(),
     ),

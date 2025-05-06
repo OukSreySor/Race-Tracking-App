@@ -45,6 +45,7 @@ class RaceSegmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompleted = segment.status == SegmentStatus.completed;
     return SizedBox(
       child: Card(
         shape: RoundedRectangleBorder(
@@ -52,7 +53,7 @@ class RaceSegmentCard extends StatelessWidget {
         ),
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-          onTap: onTap,
+          onTap: isCompleted ? null : onTap,
           leading: Icon(getSegmentIcon(), size: 40, color: Colors.black),
           title: Text(
             segment.type.name.toUpperCase(),
