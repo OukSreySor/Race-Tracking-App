@@ -55,9 +55,15 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     logProvider.undo(selectedRace, bib);
   }
 
-  String getCurrentFormattedTime() {
-    final now = DateTime.now();
-    return '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+  String? getPreviousSegment(SegmentType current) {
+    switch (current) {
+      case SegmentType.cycle:
+        return SegmentType.swim.name;
+      case SegmentType.run:
+        return SegmentType.cycle.name;
+      default:
+        return null;
+    }
   }
 
   List<Participant> getOrderedParticipants(
@@ -74,17 +80,6 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
       return aIndex.compareTo(bIndex);
     });
     return all;
-  }
-
-  String? getPreviousSegment(SegmentType current) {
-    switch (current) {
-      case SegmentType.cycle:
-        return SegmentType.swim.name; // returns 'swim'
-      case SegmentType.run:
-        return SegmentType.cycle.name; // returns 'cycle'
-      default:
-        return null;
-    }
   }
 
   @override
@@ -123,7 +118,10 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: participants.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
               itemBuilder: (context, index) {
                 final participant = participants[index];
                 final isSelected = currentLogs
@@ -151,36 +149,66 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
             if (currentLogs.isEmpty)
               const Center(child: Text('No BIBs logged yet'))
             else
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black26),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('BIB')),
-                    DataColumn(label: Text('Time')),
-                    DataColumn(label: Text('Action')),
-                  ],
-                  rows: currentLogs.map((log) {
-                    return DataRow(cells: [
-                      DataCell(Text(log['bib']!)),
-                      DataCell(Text(log['time']!)),
-                      DataCell(
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey[300],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            minimumSize: const Size(60, 30),
+              Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 30,
+                    columns: const [
+                      DataColumn(label: Center(child: Text('BIB'))),
+                      DataColumn(label: Center(child: Text('Time'))),
+                      DataColumn(label: Center(child: Text('Action'))),
+                    ],
+                    rows: currentLogs.map((log) {
+                      return DataRow(cells: [
+                        DataCell(SizedBox(
+                          width: 80,
+                          child: Center(child: Text(log['bib']!)),
+                        )),
+                        DataCell(SizedBox(
+                          width: 120,
+                          child: Center(child: Text(log['time']!)),
+                        )),
+                        DataCell(SizedBox(
+                          width: 160,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueGrey[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  minimumSize: const Size(60, 30),
+                                ),
+                                onPressed: () => undoLog(log['bib']!),
+                                child: const Text('Undo'),
+                              ),
+                              const SizedBox(width: 10),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  minimumSize: const Size(60, 30),
+                                ),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            '${log['bib']} marked for review')),
+                                  );
+                                },
+                                child: const Text('Mark'),
+                              ),
+                            ],
                           ),
-                          onPressed: () => undoLog(log['bib']!),
-                          child: const Text('Undo'),
-                        ),
-                      ),
-                    ]);
-                  }).toList(),
+                        )),
+                      ]);
+                    }).toList(),
+                  ),
                 ),
               ),
             const SizedBox(height: 30),
@@ -189,33 +217,34 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               children: [
                 CustomActionButton(label: 'Pause', onPressed: () {}),
                 CustomActionButton(
-                    label: 'Done',
-                    onPressed: () {
-                      final segmentProvider =
-                          context.read<RaceSegmentProvider>();
+                  label: 'Done',
+                  onPressed: () {
+                    final segmentProvider =
+                        context.read<RaceSegmentProvider>();
 
-                      final allLogged = participants.every((p) => currentLogs
-                          .any((log) => log['bib'] == 'BIB ${p.bib}'));
+                    final allLogged = participants.every((p) => currentLogs
+                        .any((log) => log['bib'] == 'BIB ${p.bib}'));
 
-                      if (allLogged) {
-                        final index =
-                            segmentProvider.segments.indexOf(widget.segment);
-                        segmentProvider.updateSegmentStatus(
-                            index, SegmentStatus.completed);
+                    if (allLogged) {
+                      final index = segmentProvider.segments
+                          .indexOf(widget.segment);
+                      segmentProvider.updateSegmentStatus(
+                          index, SegmentStatus.completed);
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Segment marked as completed!')),
-                        );
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text('Some participants are still missing.')),
-                        );
-                      }
-                    }),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Segment marked as completed!')),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content:
+                                Text('Some participants are still missing.')),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ],

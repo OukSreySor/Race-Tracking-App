@@ -78,8 +78,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                     final segment = segmentProvider.segments[index];
                     return RaceSegmentCard(
                       segment: segment,
-                      onTap: segmentProvider.segments
-                              .any((s) => s.status == SegmentStatus.inProgress)
+                      onTap: segment.status == SegmentStatus.inProgress
                           ? () {
                               Navigator.push(
                                 context,
