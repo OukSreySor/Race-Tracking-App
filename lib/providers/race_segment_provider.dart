@@ -8,26 +8,39 @@ class RaceSegmentProvider with ChangeNotifier {
     RaceSegment(type: SegmentType.run),
   ];
 
+  DateTime? _raceStartTime;
+
   List<RaceSegment> get segments => _segments;
+  DateTime? get raceStartTime => _raceStartTime;
+
+  /// (Starts the race)Method to initialize the global timer and the first segment
+  void startRace() {
+    _raceStartTime = DateTime.now();
+    startSegment(0);
+    notifyListeners();
+  }
+
+  void startSegment(int index) {
+    if (_segments[index].status == SegmentStatus.notStarted) {
+      _segments[index].status = SegmentStatus.inProgress;
+      _segments[index].startTime = DateTime.now();
+      notifyListeners();
+    }
+  }
 
   void updateSegmentStatus(int index, SegmentStatus newStatus) {
     _segments[index].status = newStatus;
     notifyListeners();
   }
 
-  void startSegment(int index) {
-    segments[index].status = SegmentStatus.inProgress;
-    segments[index].startTime = DateTime.now();
-    notifyListeners();
-  }
-
   void completeSegment(int index) {
-    segments[index].status = SegmentStatus.completed;
-    segments[index].endTime = DateTime.now();
+    _segments[index].status = SegmentStatus.completed;
+    _segments[index].endTime = DateTime.now();
     notifyListeners();
   }
 
   void reset() {
+    _raceStartTime = null;
     for (var segment in _segments) {
       segment.status = SegmentStatus.notStarted;
       segment.startTime = null;
@@ -38,5 +51,10 @@ class RaceSegmentProvider with ChangeNotifier {
 
   DateTime? getSegmentStartTime(SegmentType type) {
     return _segments.firstWhere((seg) => seg.type == type).startTime;
+  }
+
+  Duration? get elapsedTime {
+    if (_raceStartTime == null) return null;
+    return DateTime.now().difference(_raceStartTime!);
   }
 }

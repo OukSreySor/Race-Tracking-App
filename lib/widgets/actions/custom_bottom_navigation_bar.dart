@@ -40,7 +40,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   } else if (index == 1) {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => MonitoringScreen())); 
                   } else if (index == 2) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ResultsScreen())); //example
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ResultsScreen())); 
                   }
                 },
                 child: Container(

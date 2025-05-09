@@ -25,11 +25,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
         context.watch<ParticipantProvider>().hasParticipants;
 
     void _onStart() {
-      for (var i = 0; i < segmentProvider.segments.length; i++) {
-        if (segmentProvider.segments[i].status == SegmentStatus.notStarted) {
-          segmentProvider.startSegment(i);
-        }
-      }
+      context.read<RaceSegmentProvider>().startRace();
     }
 
     void _onStop() {

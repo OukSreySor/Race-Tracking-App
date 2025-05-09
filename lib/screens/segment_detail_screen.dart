@@ -33,15 +33,14 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     final logProvider = context.read<RaceLogProvider>();
     final segmentProvider = context.read<RaceSegmentProvider>();
 
-    final segmentStart =
-        segmentProvider.getSegmentStartTime(widget.segment.type);
-    if (segmentStart == null) return;
+    final globalStart = segmentProvider.raceStartTime;
+    if (globalStart == null) return;
 
     final now = DateTime.now();
-    final elapsed = now.difference(segmentStart);
+    final elapsed = now.difference(globalStart);
     final formatted = formatDuration(elapsed);
 
-    logProvider.log(selectedRace, 'BIB $bibNumber', formatted);
+    logProvider.log(context, selectedRace, 'BIB $bibNumber', formatted);
   }
 
   String formatDuration(Duration duration) {
