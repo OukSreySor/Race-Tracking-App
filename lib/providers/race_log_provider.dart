@@ -5,18 +5,27 @@ import 'race_segment_provider.dart';
 import '../model/race_segment.dart';
 
 class RaceLogProvider with ChangeNotifier {
-  final Map<String, List<Map<String, String>>> _logs = {};
+  final Map<String, List<Map<String, dynamic>>> _logs = {}; // Includes bib, time, datetime
+  final Map<String, DateTime> _segmentStartTimes = {}; // Start time of each segment
 
-  List<Map<String, String>> getLogs(String segment) => _logs[segment] ?? [];
+  Map<String, DateTime> get segmentStartTimes => _segmentStartTimes;
 
-  void log(BuildContext context, String segment, String bib, String time) {
+  List<Map<String, dynamic>> getLogs(String segment) => _logs[segment] ?? [];
+
+  void log(BuildContext context, String segment, String bib, String formattedTime) {
     _logs.putIfAbsent(segment, () => []);
 
     if (_logs[segment]!.any((e) => e['bib'] == bib)) return;
 
-    _logs[segment]!.add({'bib': bib, 'time': time});
-    notifyListeners();
+    final now = DateTime.now();
 
+    _logs[segment]!.add({
+      'bib': bib,
+      'time': formattedTime,
+      'loggedAt': now, // Save actual DateTime for calculations
+    });
+
+    notifyListeners();
     _startNextSegment(context, segment);
   }
 
@@ -33,9 +42,21 @@ class RaceLogProvider with ChangeNotifier {
 
       if (nextSegment.status == SegmentStatus.notStarted) {
         segmentProvider.startSegment(currentIndex + 1);
+
+        final nextSegmentKey = nextSegment.type.name.toLowerCase();
+        _segmentStartTimes.putIfAbsent(nextSegmentKey, () => DateTime.now());
       }
     }
   }
+
+  void setRaceStartTime(String segment) {
+    if (!_segmentStartTimes.containsKey(segment.toLowerCase())) {
+      _segmentStartTimes[segment.toLowerCase()] = DateTime.now();
+      notifyListeners();
+    }
+  }
+
+  DateTime? getSegmentStartTime(String segment) => _segmentStartTimes[segment.toLowerCase()];
 
   List<String> getAvailableBibsForSegment(BuildContext context, String segment) {
     final segmentOrder = ['swim', 'cycle', 'run'];
@@ -43,17 +64,15 @@ class RaceLogProvider with ChangeNotifier {
 
     if (segment.toLowerCase() == 'swim') {
       final participantProvider = Provider.of<ParticipantProvider>(context, listen: false);
-      
       return participantProvider.participants.map((p) => p.bib.toString()).toList();
     }
-    
-    // Get bibs that completed the previous segment
+
     if (currentIndex > 0) {
       final prevSegment = segmentOrder[currentIndex - 1];
-      final completedBibs = _logs[prevSegment]?.map((e) => e['bib']!).toSet().toList() ?? [];
-      print('Available bibs for $segment (completed in $prevSegment): $completedBibs');
+      final completedBibs = _logs[prevSegment]?.map((e) => e['bib'] as String).toSet().toList() ?? [];
       return completedBibs;
     }
+
     return [];
   }
 
@@ -64,6 +83,7 @@ class RaceLogProvider with ChangeNotifier {
 
   void reset() {
     _logs.clear();
+    _segmentStartTimes.clear();
     notifyListeners();
   }
 }

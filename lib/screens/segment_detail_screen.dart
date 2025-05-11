@@ -74,7 +74,6 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
   ) {
     final previousBibs = previousLogs.map((e) => e['bib']).toSet();
 
-    // Keep everyone who belonged to the previous segment
     final filtered = all.where((p) => previousBibs.contains(p.bib)).toList();
 
     filtered.sort((a, b) {
@@ -93,8 +92,11 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     final currentLogs = logProvider.getLogs(selectedRace);
 
     final prevSegmentKey = getPreviousSegment(widget.segment.type);
-    final List<Map<String, String>> prevLogs =
-        prevSegmentKey != null ? logProvider.getLogs(prevSegmentKey) : [];
+    final List<Map<String, String>> prevLogs = prevSegmentKey != null
+    ? logProvider.getLogs(prevSegmentKey).map<Map<String, String>>((e) {
+        return e.map((key, value) => MapEntry(key, value.toString()));
+      }).toList()
+    : [];
 
     final participants = prevSegmentKey != null
         ? getOrderedParticipants(rawParticipants, prevLogs)
@@ -203,7 +205,32 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                                   ),
                                   minimumSize: const Size(60, 30),
                                 ),
-                                onPressed: () => undoLog(log['bib']!),
+                                onPressed: () async {
+                                  final confirmed = await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Confirm Undo'),
+                                      content: const Text(
+                                          'Are you sure you want to undo this log?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text('Undo'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirmed == true) {
+                                    undoLog(log['bib']!);
+                                  }
+                                },
                                 child: const Text('Undo'),
                               ),
                             ),
@@ -256,7 +283,6 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                       final currentIndex =
                           segmentProvider.segments.indexOf(widget.segment);
 
-                      // Check if previous segment exists and is completed
                       if (currentIndex > 0) {
                         final prevSegment =
                             segmentProvider.segments[currentIndex - 1];
@@ -270,7 +296,6 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                         }
                       }
 
-                      // Check if all visible participants are logged
                       final allLogged = participants.every(
                           (p) => currentLogs.any((log) => log['bib'] == p.bib));
 
