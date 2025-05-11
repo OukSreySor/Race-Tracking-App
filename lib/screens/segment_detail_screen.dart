@@ -74,11 +74,8 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
   ) {
     final previousBibs = previousLogs.map((e) => e['bib']).toSet();
 
-    // Include only those from previous segment, even if not logged in current
-    final filtered = all
-        .where((p) => previousBibs.contains(p.bib))
-        .where((p) => !markedBibs.contains(p.bib))
-        .toList();
+    // Keep everyone who belonged to the previous segment
+    final filtered = all.where((p) => previousBibs.contains(p.bib)).toList();
 
     filtered.sort((a, b) {
       final aIndex = previousLogs.indexWhere((e) => e['bib'] == a.bib);
@@ -101,7 +98,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
 
     final participants = prevSegmentKey != null
         ? getOrderedParticipants(rawParticipants, prevLogs)
-        : rawParticipants.where((p) => !markedBibs.contains(p.bib)).toList();
+        : rawParticipants;
 
     return Scaffold(
       appBar: AppBar(
@@ -174,9 +171,16 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                   child: DataTable(
                     columnSpacing: 20,
                     columns: const [
-                      DataColumn(label: SizedBox(width: 80, child: Center(child: Text('BIB')))),
-                      DataColumn(label: SizedBox(width: 120, child: Center(child: Text('Time')))),
-                      DataColumn(label: SizedBox(width: 200, child: Center(child: Text('Action')))),
+                      DataColumn(
+                          label: SizedBox(
+                              width: 80, child: Center(child: Text('BIB')))),
+                      DataColumn(
+                          label: SizedBox(
+                              width: 120, child: Center(child: Text('Time')))),
+                      DataColumn(
+                          label: SizedBox(
+                              width: 200,
+                              child: Center(child: Text('Action')))),
                     ],
                     rows: currentLogs.map((log) {
                       return DataRow(cells: [
@@ -244,13 +248,12 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 CustomActionButton(
-                  backgroundColor: RaceColors.backgroundButton,
+                    backgroundColor: RaceColors.backgroundButton,
                     label: 'Done',
                     onPressed: () {
                       final segmentProvider =
                           context.read<RaceSegmentProvider>();
                       final currentIndex =
-
                           segmentProvider.segments.indexOf(widget.segment);
 
                       // Check if previous segment exists and is completed

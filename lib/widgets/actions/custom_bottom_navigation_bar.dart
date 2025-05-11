@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:race_tracking_app/providers/bottom_nav_provider.dart';
 import 'package:race_tracking_app/screens/home_screen.dart';
 import 'package:race_tracking_app/screens/monitoring_screen.dart';
-
 import '../../screens/result_screen.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
