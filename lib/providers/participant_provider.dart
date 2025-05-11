@@ -4,12 +4,15 @@ import '../model/participant.dart';
 
 class ParticipantProvider with ChangeNotifier {
   List<Participant> _participants = [];
+  final Set<String> _markedBibs = {};
 
   ParticipantProvider(){
     loadParticipants();
   }
 
   List<Participant> get participants => _participants;
+  Set<String> get markedBibs => _markedBibs;
+
 
   // Load all participants from the database
   Future<void> loadParticipants() async {
@@ -34,6 +37,18 @@ class ParticipantProvider with ChangeNotifier {
     await DatabaseService().deleteParticipant(id);
     await loadParticipants();  
   }
+
+  void markBib(String bib) {
+    _markedBibs.add(bib);
+    notifyListeners();
+  }
+
+  void unmarkBib(String bib) {
+    _markedBibs.remove(bib);
+    notifyListeners();
+  }
+
+  bool isMarked(String bib) => _markedBibs.contains(bib);
 
   bool isBibAlreadyUsed (String bib) {
     return _participants.any((participant) => participant.bib == bib);

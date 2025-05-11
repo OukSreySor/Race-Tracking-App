@@ -18,6 +18,7 @@ class SegmentDetailsScreen extends StatefulWidget {
 
 class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
   late String selectedRace;
+  Set<String> markedBibs = {};
 
   @override
   void initState() {
@@ -40,7 +41,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     final elapsed = now.difference(globalStart);
     final formatted = formatDuration(elapsed);
 
-    logProvider.log(context, selectedRace, 'BIB $bibNumber', formatted);
+    logProvider.log(context, selectedRace, bibNumber, formatted);
   }
 
   String formatDuration(Duration duration) {
@@ -70,16 +71,21 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     List<Participant> all,
     List<Map<String, String>> previousLogs,
   ) {
-    final order = previousLogs.map((e) => e['bib']).toList();
-    all.sort((a, b) {
-      final aIndex = order.indexOf('BIB ${a.bib}');
-      final bIndex = order.indexOf('BIB ${b.bib}');
-      if (aIndex == -1 && bIndex == -1) return 0;
-      if (aIndex == -1) return 1;
-      if (bIndex == -1) return -1;
+    final previousBibs = previousLogs.map((e) => e['bib']).toSet();
+
+    // Include only those from previous segment, even if not logged in current
+    final filtered = all
+        .where((p) => previousBibs.contains(p.bib))
+        .where((p) => !markedBibs.contains(p.bib))
+        .toList();
+
+    filtered.sort((a, b) {
+      final aIndex = previousLogs.indexWhere((e) => e['bib'] == a.bib);
+      final bIndex = previousLogs.indexWhere((e) => e['bib'] == b.bib);
       return aIndex.compareTo(bIndex);
     });
-    return all;
+
+    return filtered;
   }
 
   @override
@@ -87,9 +93,14 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     final logProvider = context.watch<RaceLogProvider>();
     final rawParticipants = context.watch<ParticipantProvider>().participants;
     final currentLogs = logProvider.getLogs(selectedRace);
-    final prevLogs =
-        logProvider.getLogs(getPreviousSegment(widget.segment.type) ?? '');
-    final participants = getOrderedParticipants(rawParticipants, prevLogs);
+
+    final prevSegmentKey = getPreviousSegment(widget.segment.type);
+    final List<Map<String, String>> prevLogs =
+        prevSegmentKey != null ? logProvider.getLogs(prevSegmentKey) : [];
+
+    final participants = prevSegmentKey != null
+        ? getOrderedParticipants(rawParticipants, prevLogs)
+        : rawParticipants.where((p) => !markedBibs.contains(p.bib)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -124,8 +135,8 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               ),
               itemBuilder: (context, index) {
                 final participant = participants[index];
-                final isSelected = currentLogs
-                    .any((log) => log['bib'] == 'BIB ${participant.bib}');
+                final isSelected =
+                    currentLogs.any((log) => log['bib'] == participant.bib);
                 return GestureDetector(
                   onTap: () => logBib(participant.bib),
                   child: Container(
@@ -135,8 +146,15 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text(participant.bib,
-                          style: const TextStyle(fontSize: 18)),
+                      child: Text(
+                        participant.bib,
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: markedBibs.contains(participant.bib)
+                              ? Colors.red
+                              : Colors.black,
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -188,20 +206,29 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[300],
+                                  backgroundColor:
+                                      markedBibs.contains(log['bib']!)
+                                          ? Colors.green[300]
+                                          : Colors.red[300],
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   minimumSize: const Size(60, 30),
                                 ),
                                 onPressed: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            '${log['bib']} marked for review')),
-                                  );
+                                  setState(() {
+                                    if (markedBibs.contains(log['bib']!)) {
+                                      markedBibs.remove(log['bib']!);
+                                    } else {
+                                      markedBibs.add(log['bib']!);
+                                    }
+                                  });
                                 },
-                                child: const Text('Mark'),
+                                child: Text(
+                                  markedBibs.contains(log['bib']!)
+                                      ? 'Unmark'
+                                      : 'Mark',
+                                ),
                               ),
                             ),
                           ],
@@ -216,33 +243,47 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 CustomActionButton(
-                  label: 'Done',
-                  onPressed: () {
-                    final segmentProvider = context.read<RaceSegmentProvider>();
-
-                    final allLogged = participants.every((p) =>
-                        currentLogs.any((log) => log['bib'] == 'BIB ${p.bib}'));
-
-                    if (allLogged) {
-                      final index =
+                    label: 'Done',
+                    onPressed: () {
+                      final segmentProvider =
+                          context.read<RaceSegmentProvider>();
+                      final currentIndex =
                           segmentProvider.segments.indexOf(widget.segment);
-                      segmentProvider.updateSegmentStatus(
-                          index, SegmentStatus.completed);
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Segment marked as completed!')),
-                      );
-                      Navigator.pop(context);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content:
-                                Text('Some participants are still missing.')),
-                      );
-                    }
-                  },
-                ),
+                      // Check if previous segment exists and is completed
+                      if (currentIndex > 0) {
+                        final prevSegment =
+                            segmentProvider.segments[currentIndex - 1];
+                        if (prevSegment.status != SegmentStatus.completed) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    '${prevSegment.type.name} is not completed yet.')),
+                          );
+                          return;
+                        }
+                      }
+
+                      // Check if all visible participants are logged
+                      final allLogged = participants.every(
+                          (p) => currentLogs.any((log) => log['bib'] == p.bib));
+
+                      if (allLogged) {
+                        segmentProvider.updateSegmentStatus(
+                            currentIndex, SegmentStatus.completed);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Segment marked as completed!')),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text('Some participants are still missing.')),
+                        );
+                      }
+                    }),
               ],
             ),
           ],

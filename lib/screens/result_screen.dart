@@ -34,10 +34,9 @@ class ResultsScreen extends StatelessWidget {
     final runLogs = logProvider.getLogs('run');
 
     List<Map<String, String>> resultData = participants.map((p) {
-      final bib = 'BIB ${p.bib}';
-      final swimTime = swimLogs.firstWhere((l) => l['bib'] == bib, orElse: () => {})['time'] ?? '00:00:00';
-      final cycleTime = cycleLogs.firstWhere((l) => l['bib'] == bib, orElse: () => {})['time'] ?? '00:00:00';
-      final runTime = runLogs.firstWhere((l) => l['bib'] == bib, orElse: () => {})['time'] ?? '00:00:00';
+      final swimTime = swimLogs.firstWhere((l) => l['bib'] == p.bib, orElse: () => {})['time'] ?? '00:00:00';
+      final cycleTime = cycleLogs.firstWhere((l) => l['bib'] == p.bib, orElse: () => {})['time'] ?? '00:00:00';
+      final runTime = runLogs.firstWhere((l) => l['bib'] == p.bib, orElse: () => {})['time'] ?? '00:00:00';
 
       final totalDuration = parseTime(swimTime) +
           parseTime(cycleTime) +
