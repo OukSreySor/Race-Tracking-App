@@ -68,6 +68,7 @@ class _MonitoringScreenState extends State<MonitoringScreen> {
                   onStart: _onStart,
                   onStop: _onStop,
                   hasParticipants: _hasParticipants,
+                  isStarted: segmentProvider.raceStarted, 
                 ),
                 const SizedBox(height: 30),
                 ListView.builder(

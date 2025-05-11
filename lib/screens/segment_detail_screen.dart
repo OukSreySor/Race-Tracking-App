@@ -29,7 +29,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
         );
   }
 
-  void logBib(int bibNumber) {
+  void logBib(String bibNumber) {
     final logProvider = context.read<RaceLogProvider>();
     final segmentProvider = context.read<RaceSegmentProvider>();
 
@@ -107,9 +107,9 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                raceButton(Icons.pool, 'Swim'),
-                raceButton(Icons.directions_bike, 'Cycle'),
-                raceButton(Icons.directions_run, 'Run'),
+                raceIcon(Icons.pool, 'Swim'),
+                raceIcon(Icons.directions_bike, 'Cycle'),
+                raceIcon(Icons.directions_run, 'Run'),
               ],
             ),
             const SizedBox(height: 20),
@@ -127,7 +127,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                 final isSelected = currentLogs
                     .any((log) => log['bib'] == 'BIB ${participant.bib}');
                 return GestureDetector(
-                  onTap: () => logBib(int.parse(participant.bib)),
+                  onTap: () => logBib(participant.bib),
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.blueGrey[200] : Colors.white,
@@ -153,7 +153,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    columnSpacing: 30,
+                    columnSpacing: 20,
                     columns: const [
                       DataColumn(label: Center(child: Text('BIB'))),
                       DataColumn(label: Center(child: Text('Time'))),
@@ -169,12 +169,10 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                           width: 120,
                           child: Center(child: Text(log['time']!)),
                         )),
-                        DataCell(SizedBox(
-                          width: 160,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
+                        DataCell(Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blueGrey[300],
                                   shape: RoundedRectangleBorder(
@@ -185,8 +183,10 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                                 onPressed: () => undoLog(log['bib']!),
                                 child: const Text('Undo'),
                               ),
-                              const SizedBox(width: 10),
-                              ElevatedButton(
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red[300],
                                   shape: RoundedRectangleBorder(
@@ -203,8 +203,8 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                                 },
                                 child: const Text('Mark'),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         )),
                       ]);
                     }).toList(),
@@ -215,19 +215,17 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                CustomActionButton(label: 'Pause', onPressed: () {}),
                 CustomActionButton(
                   label: 'Done',
                   onPressed: () {
-                    final segmentProvider =
-                        context.read<RaceSegmentProvider>();
+                    final segmentProvider = context.read<RaceSegmentProvider>();
 
-                    final allLogged = participants.every((p) => currentLogs
-                        .any((log) => log['bib'] == 'BIB ${p.bib}'));
+                    final allLogged = participants.every((p) =>
+                        currentLogs.any((log) => log['bib'] == 'BIB ${p.bib}'));
 
                     if (allLogged) {
-                      final index = segmentProvider.segments
-                          .indexOf(widget.segment);
+                      final index =
+                          segmentProvider.segments.indexOf(widget.segment);
                       segmentProvider.updateSegmentStatus(
                           index, SegmentStatus.completed);
 
@@ -253,26 +251,19 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
     );
   }
 
-  Widget raceButton(IconData icon, String label) {
-    final isSelected = selectedRace == label;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          selectedRace = label;
-        });
-      },
-      child: Column(
-        children: [
-          CircleAvatar(
-            backgroundColor:
-                isSelected ? Colors.blueGrey[100] : Colors.transparent,
-            radius: 30,
-            child: Icon(icon, color: Colors.black),
-          ),
-          const SizedBox(height: 8),
-          Text(label),
-        ],
-      ),
+  Widget raceIcon(IconData icon, String label) {
+    final isSelected = selectedRace.toLowerCase() == label.toLowerCase();
+    return Column(
+      children: [
+        CircleAvatar(
+          backgroundColor:
+              isSelected ? Colors.blueGrey[100] : Colors.transparent,
+          radius: 30,
+          child: Icon(icon, color: Colors.black),
+        ),
+        const SizedBox(height: 8),
+        Text(label),
+      ],
     );
   }
 }

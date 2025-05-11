@@ -9,13 +9,17 @@ class RaceSegmentProvider with ChangeNotifier {
   ];
 
   DateTime? _raceStartTime;
+  bool _raceStarted = false; 
 
   List<RaceSegment> get segments => _segments;
   DateTime? get raceStartTime => _raceStartTime;
+  bool get raceStarted => _raceStarted;
 
-  /// (Starts the race)Method to initialize the global timer and the first segment
+
+  /// (Starts the race) Method to initialize the global timer and the first segment
   void startRace() {
     _raceStartTime = DateTime.now();
+    _raceStarted = true; 
     startSegment(0);
     notifyListeners();
   }
@@ -41,6 +45,7 @@ class RaceSegmentProvider with ChangeNotifier {
 
   void reset() {
     _raceStartTime = null;
+    _raceStarted = false; 
     for (var segment in _segments) {
       segment.status = SegmentStatus.notStarted;
       segment.startTime = null;

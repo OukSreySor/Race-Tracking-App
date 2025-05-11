@@ -6,6 +6,7 @@ class Participant {
   final String name;
   final String gender;
   final int age;
+  bool isMarked;
 
   Participant({
     String? id,
@@ -13,5 +14,6 @@ class Participant {
     required this.name,
     required this.gender,
     required this.age,
+    this.isMarked = false,
     }): id = id ?? const Uuid().v4();
 }

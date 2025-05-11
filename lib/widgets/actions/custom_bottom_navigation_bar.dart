@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracking_app/providers/bottom_nav_provider.dart';
-import 'package:race_tracking_app/screens/add_participant_screen.dart';
 import 'package:race_tracking_app/screens/home_screen.dart';
 import 'package:race_tracking_app/screens/monitoring_screen.dart';
 

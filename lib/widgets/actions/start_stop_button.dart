@@ -4,12 +4,14 @@ class StartButton extends StatefulWidget {
   final VoidCallback onStart;
   final VoidCallback onStop;
   final bool hasParticipants;
+  final bool isStarted;
 
   const StartButton({
     super.key,
     required this.onStart,
     required this.onStop,
-    required this.hasParticipants,
+    required this.hasParticipants, 
+    required this.isStarted,
   });
 
   @override
