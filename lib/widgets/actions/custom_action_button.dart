@@ -1,4 +1,5 @@
  import 'package:flutter/material.dart';
+import 'package:race_tracking_app/theme/theme.dart';
 
 class CustomActionButton extends StatelessWidget {
   final String label;
@@ -28,7 +29,7 @@ class CustomActionButton extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
               ),
-              child: Text(label, style: TextStyle(color: Colors.white)),
+              child: Text(label, style: TextStyle(color: RaceColors.neutralDark)),
             )
           : ElevatedButton.icon(
               onPressed: onPressed,
@@ -37,8 +38,8 @@ class CustomActionButton extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               ),
-              icon: Icon(icon, color: Color(0xFF547792)),
-              label: Text(label, style: TextStyle(color: Color(0xFF547792))),
+              icon: Icon(icon, color: RaceColors.neutralDark),
+              label: Text(label, style: TextStyle(color: RaceColors.neutralDark)),
             ),
     
     );

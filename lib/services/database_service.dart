@@ -22,7 +22,7 @@ class DatabaseService {
   // Add a participant
   Future<void> addParticipant(Participant participant) async {
     try {
-      await _participantsRef.add(participant); 
+      await _participantsRef.add(participant.copyWith(createdAt: Timestamp.now())); 
     } catch (e) {
       print("Error adding participant: $e");
     }
@@ -31,7 +31,7 @@ class DatabaseService {
   // Get all participants
   Future<List<Participant>> getParticipants() async {
     try {
-      QuerySnapshot<Participant> snapshot = await _participantsRef.get();
+      QuerySnapshot<Participant> snapshot = await _participantsRef.orderBy('createdAt', descending: false).get();
       return snapshot.docs.map((doc) => doc.data()).toList(); 
     } catch (e) {
       print("Error fetching participants: $e");

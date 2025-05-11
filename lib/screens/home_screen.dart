@@ -41,7 +41,7 @@ class _ParticipantListScreenState extends State<ParticipantListScreen> {
             CustomActionButton(
               label: 'Add new participant',
               icon: Icons.add,
-              backgroundColor: Color(0xFFECEFCA),
+              backgroundColor: RaceColors.backgroundButton,
               onPressed: () {
                 Navigator.push(
                     context,

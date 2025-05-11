@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:race_tracking_app/providers/participant_provider.dart';
 import 'race_segment_provider.dart';
 import '../model/race_segment.dart';
 
@@ -34,6 +35,26 @@ class RaceLogProvider with ChangeNotifier {
         segmentProvider.startSegment(currentIndex + 1);
       }
     }
+  }
+
+  List<String> getAvailableBibsForSegment(BuildContext context, String segment) {
+    final segmentOrder = ['swim', 'cycle', 'run'];
+    final currentIndex = segmentOrder.indexOf(segment.toLowerCase());
+
+    if (segment.toLowerCase() == 'swim') {
+      final participantProvider = Provider.of<ParticipantProvider>(context, listen: false);
+      
+      return participantProvider.participants.map((p) => p.bib.toString()).toList();
+    }
+    
+    // Get bibs that completed the previous segment
+    if (currentIndex > 0) {
+      final prevSegment = segmentOrder[currentIndex - 1];
+      final completedBibs = _logs[prevSegment]?.map((e) => e['bib']!).toSet().toList() ?? [];
+      print('Available bibs for $segment (completed in $prevSegment): $completedBibs');
+      return completedBibs;
+    }
+    return [];
   }
 
   void undo(String segment, String bib) {

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 /// Definition of App colors.
 ///
 class RaceColors {
-  static Color primary = const Color(0xFF00aff5);
+  // static Color primary = const Color(0xFF00aff5);
+  static Color primary = const Color(0xFF708c91);
   static Color backgroundAccent = const Color(0xFFEDEDED);
+  static Color bgbtt = const Color(0xFFC5E1F1);
 
-  static Color neutralDark = const Color(0xFF054752);
-  static Color neutral = const Color(0xFF3d5c62);
+  static Color neutralDark = const Color(0xFF054752); 
+  static Color neutral = const Color(0xFF94B4C1);
   static Color neutralLight = const Color(0xFF708c91);
   static Color neutralLighter = const Color(0xFF92A7AB);
   static Color black = const Color.fromARGB(255, 0, 0, 0);
@@ -23,6 +25,7 @@ class RaceColors {
   static Color get iconNormal => neutral;
   static Color get iconLight => neutralLighter;
   static Color get disabled => greyLight;
+  static Color get backgroundButton => bgbtt;
 }
 
 ///

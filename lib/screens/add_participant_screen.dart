@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracking_app/model/participant.dart';
 import 'package:race_tracking_app/providers/participant_provider.dart';
+import 'package:race_tracking_app/theme/theme.dart';
 import 'package:race_tracking_app/widgets/inputs/custom_textfield.dart';
 import 'package:race_tracking_app/widgets/actions/custom_action_button.dart';
 
@@ -147,7 +149,7 @@ class _AddParticipantScreenState extends State<AddParticipantScreen> {
               // Add Button
               CustomActionButton(
                 label: 'Add',  
-                backgroundColor: Color(0xFF547792),
+                backgroundColor: RaceColors.backgroundButton,
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     final newBib = _bibController.text.trim();
@@ -166,6 +168,7 @@ class _AddParticipantScreenState extends State<AddParticipantScreen> {
                       name: _nameController.text,
                       gender: _selectedGender!,
                       age: int.parse(_ageController.text),
+                      createdAt: Timestamp.now(),
                     );
 
                     if (widget.participant != null) {

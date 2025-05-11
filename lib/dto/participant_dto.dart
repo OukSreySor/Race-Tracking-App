@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:race_tracking_app/model/participant.dart';
 
 class ParticipantDto {
@@ -8,6 +9,7 @@ class ParticipantDto {
       name: json['name'] as String,
       gender: json['gender'] as String,
       age: (json['age'] as num).toInt(),
+      createdAt: (json['createdAt']) as Timestamp,
     );
   }
 
@@ -17,6 +19,7 @@ class ParticipantDto {
       'name': participant.name,
       'gender': participant.gender,
       'age': participant.age,
+      'createdAt': participant.createdAt
     };
   }
 }

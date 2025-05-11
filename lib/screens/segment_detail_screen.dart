@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:race_tracking_app/model/race_segment.dart';
+import 'package:race_tracking_app/theme/theme.dart';
 import '../model/participant.dart';
 import '../providers/participant_provider.dart';
 import '../providers/race_segment_provider.dart';
@@ -129,9 +130,9 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: participants.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                crossAxisCount: 5,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemBuilder: (context, index) {
                 final participant = participants[index];
@@ -141,7 +142,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                   onTap: () => logBib(participant.bib),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.blueGrey[200] : Colors.white,
+                      color: isSelected ? RaceColors.neutral : Colors.white,
                       border: Border.all(color: Colors.black26),
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -173,9 +174,9 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                   child: DataTable(
                     columnSpacing: 20,
                     columns: const [
-                      DataColumn(label: Center(child: Text('BIB'))),
-                      DataColumn(label: Center(child: Text('Time'))),
-                      DataColumn(label: Center(child: Text('Action'))),
+                      DataColumn(label: SizedBox(width: 80, child: Center(child: Text('BIB')))),
+                      DataColumn(label: SizedBox(width: 120, child: Center(child: Text('Time')))),
+                      DataColumn(label: SizedBox(width: 200, child: Center(child: Text('Action')))),
                     ],
                     rows: currentLogs.map((log) {
                       return DataRow(cells: [
@@ -192,7 +193,7 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueGrey[300],
+                                  backgroundColor: RaceColors.neutral,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -240,14 +241,16 @@ class _SegmentDetailsScreenState extends State<SegmentDetailsScreen> {
               ),
             const SizedBox(height: 30),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 CustomActionButton(
+                  backgroundColor: RaceColors.backgroundButton,
                     label: 'Done',
                     onPressed: () {
                       final segmentProvider =
                           context.read<RaceSegmentProvider>();
                       final currentIndex =
+
                           segmentProvider.segments.indexOf(widget.segment);
 
                       // Check if previous segment exists and is completed
